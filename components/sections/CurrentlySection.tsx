@@ -4,6 +4,16 @@ import { Reveal } from "@/components/ui/Reveal";
 import * as LucideIcons from "lucide-react";
 import type { Currently } from "@/lib/types/database";
 
+const categoryIconMap: Record<string, keyof typeof LucideIcons> = {
+  reading: "BookOpen",
+  learning: "Lightbulb",
+  building: "Hammer",
+  watching: "Tv",
+  listening: "Headphones",
+  exploring: "Compass",
+  working_on: "Briefcase"
+};
+
 export function CurrentlySection({ items }: { items: Currently[] }) {
   if (!items || items.length === 0) return null;
 
@@ -40,9 +50,8 @@ export function CurrentlySection({ items }: { items: Currently[] }) {
             >
               <div className="flex flex-col gap-6">
                 {items.map((item, i) => {
-                  const Icon = item.icon_name && (LucideIcons as any)[item.icon_name] 
-                    ? (LucideIcons as any)[item.icon_name] 
-                    : LucideIcons.Activity;
+                  const iconName = categoryIconMap[item.category] || "Activity";
+                  const Icon = (LucideIcons as any)[iconName] || LucideIcons.Activity;
 
                   return (
                     <div
@@ -61,11 +70,11 @@ export function CurrentlySection({ items }: { items: Currently[] }) {
                       <div className="flex-1 min-w-0 flex items-center pt-1">
                         {item.url ? (
                            <a href={item.url} target="_blank" rel="noreferrer" className="text-body font-medium hover:text-[var(--accent)] transition-colors" style={{ color: "var(--text-primary)" }}>
-                              {item.text}
+                              {item.title}
                            </a>
                         ) : (
                            <p className="text-body font-medium" style={{ color: "var(--text-primary)" }}>
-                              {item.text}
+                              {item.title}
                            </p>
                         )}
                       </div>

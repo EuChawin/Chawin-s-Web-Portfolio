@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const project = await getProjectBySlug(slug);
   return {
     title: project ? `${project.title} | Projects` : "Project Not Found",
-    description: project?.excerpt || project?.description || "",
+    description: project?.tagline || project?.description || "",
   };
 }
 
@@ -70,15 +70,11 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             </Reveal>
 
             <Reveal delay={0.1}>
-              {project.content ? (
-                  <div className="prose-portfolio max-w-none" dangerouslySetInnerHTML={{ __html: project.content }} />
-              ) : (
-                  <div className="prose-portfolio">
-                    {project.description.split("\n\n").map((para, i) => (
-                      <p key={i} className="mb-4 text-body" style={{ color: "var(--text-secondary)", lineHeight: "1.75" }}>{para}</p>
-                    ))}
-                  </div>
-              )}
+              <div className="prose-portfolio">
+                {project.description ? project.description.split("\n\n").map((para, i) => (
+                  <p key={i} className="mb-4 text-body" style={{ color: "var(--text-secondary)", lineHeight: "1.75" }}>{para}</p>
+                )) : null}
+              </div>
             </Reveal>
           </div>
 
@@ -92,7 +88,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                       <p className="section-label mb-1">Date</p>
                       <div className="flex items-center gap-2 text-body-sm" style={{ color: "var(--text-primary)" }}>
                         <Calendar size={13} style={{ color: "var(--text-tertiary)" }} /> 
-                        {formatDateShort(project.start_date)} {project.end_date ? ` — ${formatDateShort(project.end_date)}` : (project.status === "in-progress" ? " — Present" : "")}
+                        {formatDateShort(project.start_date)} {project.end_date ? ` — ${formatDateShort(project.end_date)}` : (project.status === "in_progress" ? " — Present" : "")}
                       </div>
                     </div>
                   )}
@@ -106,12 +102,12 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                   )}
                 </div>
                 
-                {(project.github_url || project.demo_url) && (
+                {(project.repo_url || project.demo_url) && (
                    <>
                       <div className="divider mb-6" />
                       <div className="flex flex-col gap-3">
-                        {project.github_url && (
-                          <a href={project.github_url} target="_blank" rel="noopener noreferrer" className="btn-ghost w-full justify-center">
+                        {project.repo_url && (
+                          <a href={project.repo_url} target="_blank" rel="noopener noreferrer" className="btn-ghost w-full justify-center">
                             <Github size={14} /> View on GitHub
                           </a>
                         )}

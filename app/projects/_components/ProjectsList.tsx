@@ -21,7 +21,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: Project[] }
   const filtered = initialProjects.filter((p) => {
     const matchSearch = p.title.toLowerCase().includes(search.toLowerCase()) || 
                        (p.description || "").toLowerCase().includes(search.toLowerCase()) ||
-                       (p.excerpt || "").toLowerCase().includes(search.toLowerCase());
+                       (p.tagline || "").toLowerCase().includes(search.toLowerCase());
     const matchTag = activeTag === "All" || (p.tags && p.tags.includes(activeTag));
     return matchSearch && matchTag;
   });
@@ -87,7 +87,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: Project[] }
                   </span>
                 </div>
                 <h2 className="font-serif text-h2 mb-3 group-hover:text-[var(--accent)] transition-colors" style={{ color: "var(--text-primary)" }}>{featured.title}</h2>
-                <p className="text-body mb-6" style={{ color: "var(--text-secondary)", lineHeight: "1.7" }}>{featured.excerpt || featured.description}</p>
+                <p className="text-body mb-6" style={{ color: "var(--text-secondary)", lineHeight: "1.7" }}>{featured.tagline || featured.description}</p>
                 <div className="flex flex-wrap gap-1.5 mb-6">
                   {featured.tags?.map((t) => <span key={t} className="tag">{t}</span>)}
                 </div>
@@ -121,7 +121,7 @@ export function ProjectsList({ initialProjects }: { initialProjects: Project[] }
                     </span>
                   </div>
                   <h3 className="font-medium text-body-lg mb-2 group-hover:text-[var(--accent)] transition-colors" style={{ color: "var(--text-primary)" }}>{p.title}</h3>
-                  <p className="text-body-sm mb-4 line-clamp-2" style={{ color: "var(--text-secondary)", lineHeight: "1.6" }}>{p.excerpt || p.description}</p>
+                  <p className="text-body-sm mb-4 line-clamp-2" style={{ color: "var(--text-secondary)", lineHeight: "1.6" }}>{p.tagline || p.description}</p>
                   <div className="flex flex-wrap gap-1.5 mt-auto">
                     {p.tags?.slice(0, 3).map((t) => <span key={t} className="tag text-[11px] px-2 py-0.5">{t}</span>)}
                     {(p.tags?.length || 0) > 3 && <span className="tag text-[11px] px-2 py-0.5">+{(p.tags?.length || 0) - 3}</span>}

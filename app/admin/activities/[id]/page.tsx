@@ -4,8 +4,9 @@ import { notFound } from 'next/navigation'
 
 export const metadata = { title: 'Edit Activity | Admin CMS' }
 
-export default async function EditActivityPage({ params }: { params: { id: string } }) {
-  const activity = await adminGetActivityById(params.id)
+export default async function EditActivityPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const activity = await adminGetActivityById(id)
 
   if (!activity) {
     notFound()

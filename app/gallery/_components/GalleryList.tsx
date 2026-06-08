@@ -61,13 +61,13 @@ export function GalleryList({ initialItems }: { initialItems: GalleryItem[] }) {
               )}
               style={{ background: "var(--bg-surface-2)", border: "1px solid var(--border)" }}
             >
-              <Image src={item.url} alt={item.caption || "Gallery image"} fill className="object-cover" />
+              <Image src={item.file_url} alt={item.title || item.alt_text || "Gallery image"} fill className="object-cover" />
               {/* Caption overlay */}
               <div
                 className="absolute inset-0 flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                 style={{ background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%)" }}
               >
-                <p className="text-white text-body-sm font-medium text-left line-clamp-2">{item.caption}</p>
+                <p className="text-white text-body-sm font-medium text-left line-clamp-2">{item.title}</p>
               </div>
             </button>
           ))}
@@ -111,10 +111,10 @@ export function GalleryList({ initialItems }: { initialItems: GalleryItem[] }) {
                 className="relative w-full rounded-xl flex items-center justify-center overflow-hidden"
                 style={{ height: "60vh", background: "var(--bg-surface-2)" }}
               >
-                <Image src={lightboxItem.url} alt={lightboxItem.caption || "Image"} fill className="object-contain" />
+                <Image src={lightboxItem.file_url} alt={lightboxItem.title || lightboxItem.alt_text || "Image"} fill className="object-contain" />
               </div>
               <div className="text-center">
-                <p className="text-white font-medium text-body-lg">{lightboxItem.caption}</p>
+                <p className="text-white font-medium text-body-lg">{lightboxItem.title}</p>
                 {lightboxItem.category && <p className="text-white/50 text-body-sm mt-1">{lightboxItem.category}</p>}
               </div>
             </motion.div>

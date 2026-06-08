@@ -4,8 +4,9 @@ import { notFound } from 'next/navigation'
 
 export const metadata = { title: 'Edit Post | Admin CMS' }
 
-export default async function EditBlogPostPage({ params }: { params: { id: string } }) {
-  const post = await adminGetBlogPostById(params.id)
+export default async function EditBlogPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const post = await adminGetBlogPostById(id)
 
   if (!post) {
     notFound()

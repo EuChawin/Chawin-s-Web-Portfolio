@@ -119,7 +119,7 @@ function ProjectCard({ project }: { project: Project }) {
           className="text-body-sm mb-4 line-clamp-2"
           style={{ color: "var(--text-secondary)", lineHeight: "1.6" }}
         >
-          {project.excerpt || project.description}
+          {project.tagline || project.description}
         </p>
 
         {/* Tags */}
@@ -142,9 +142,9 @@ function ProjectCard({ project }: { project: Project }) {
             View project <ArrowRight size={12} />
           </span>
           <div className="flex items-center gap-2">
-            {project.github_url && (
+            {project.repo_url && (
               <a
-                href={project.github_url}
+                href={project.repo_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
