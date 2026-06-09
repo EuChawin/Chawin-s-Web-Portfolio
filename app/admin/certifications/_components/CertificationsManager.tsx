@@ -6,6 +6,7 @@ import { PlusCircle, Edit, Trash2, Loader2, Award, ExternalLink } from 'lucide-r
 import { addCertification, updateCertification, deleteCertification } from '@/lib/actions/certifications'
 import type { Certification } from '@/lib/types/database'
 import { formatDateShort } from '@/lib/utils/slug'
+import { ImageUpload } from '@/components/ui/ImageUpload'
 
 export function CertificationsManager({ items }: { items: Certification[] }) {
   const router = useRouter()
@@ -13,11 +14,14 @@ export function CertificationsManager({ items }: { items: Certification[] }) {
   const [isAdding, setIsAdding] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
-  const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAdd = async (e: React.FormEvent<HTMLFormElement>, imageFile: File | null) => {
     e.preventDefault()
     setIsSaving(true)
     try {
-      await addCertification(new FormData(e.currentTarget))
+      const formData = new FormData(e.currentTarget)
+      if (imageFile) formData.append('image', imageFile)
+      formData.append('display_order', items.length.toString())
+      await addCertification(formData)
       setIsAdding(false)
       router.refresh()
     } finally {
@@ -25,11 +29,13 @@ export function CertificationsManager({ items }: { items: Certification[] }) {
     }
   }
 
-  const handleEdit = async (id: string, e: React.FormEvent<HTMLFormElement>) => {
+  const handleEdit = async (id: string, e: React.FormEvent<HTMLFormElement>, imageFile: File | null) => {
     e.preventDefault()
     setIsSaving(true)
     try {
-      await updateCertification(id, new FormData(e.currentTarget))
+      const formData = new FormData(e.currentTarget)
+      if (imageFile) formData.append('image', imageFile)
+      await updateCertification(id, formData)
       setEditingId(null)
       router.refresh()
     } finally {
@@ -44,36 +50,53 @@ export function CertificationsManager({ items }: { items: Certification[] }) {
   }
 
   const CertForm = ({ item, onSubmit, onCancel }: any) => {
+    const [imageFile, setImageFile] = useState<File | null>(null)
+    
     return (
-      <form onSubmit={onSubmit} className="card p-5 border-[var(--accent)] bg-[var(--accent-muted)] mb-8">
+      <form onSubmit={(e) => onSubmit(e, imageFile)} className="card p-5 border-[var(--accent)] bg-[var(--accent-muted)] mb-8">
          <h3 className="font-medium mb-4">{item ? 'Edit Certification' : 'New Certification'}</h3>
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="md:col-span-2">
-               <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Certification Name *</label>
-               <input name="name" required defaultValue={item?.name} placeholder="e.g., AWS Certified Solutions Architect" className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm" />
-            </div>
-            <div className="md:col-span-2">
-               <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Issuing Organization *</label>
-               <input name="issuer" required defaultValue={item?.issuer} placeholder="e.g., Amazon Web Services" className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm" />
-            </div>
-            
-            <div>
-               <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Issue Date *</label>
-               <input name="issue_date" type="date" required defaultValue={item?.issue_date} className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm text-[var(--text-secondary)]" />
-            </div>
-            <div>
-               <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Expiration Date</label>
-               <input name="expiry_date" type="date" defaultValue={item?.expiry_date || ''} className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm text-[var(--text-secondary)]" />
-            </div>
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+             <div className="md:col-span-2 space-y-4">
+                 <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Certification Name *</label>
+                    <input name="name" required defaultValue={item?.name} placeholder="e.g., AWS Certified Solutions Architect" className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm" />
+                 </div>
+                 <div>
+                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Issuing Organization *</label>
+                    <input name="issuer" required defaultValue={item?.issuer} placeholder="e.g., Amazon Web Services" className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm" />
+                 </div>
+                 
+                 <div className="grid grid-cols-2 gap-4">
+                     <div>
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Issue Date *</label>
+                        <input name="issue_date" type="date" required defaultValue={item?.issue_date} className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm text-[var(--text-secondary)]" />
+                     </div>
+                     <div>
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Expiration Date</label>
+                        <input name="expiry_date" type="date" defaultValue={item?.expiry_date || ''} className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm text-[var(--text-secondary)]" />
+                     </div>
+                 </div>
 
-            <div>
-               <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Credential ID</label>
-               <input name="credential_id" defaultValue={item?.credential_id || ''} placeholder="e.g., AWS-12345" className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm" />
-            </div>
-            <div>
-               <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Credential URL</label>
-               <input name="credential_url" type="url" defaultValue={item?.credential_url || ''} placeholder="https://..." className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm" />
-            </div>
+                 <div className="grid grid-cols-2 gap-4">
+                     <div>
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Credential ID</label>
+                        <input name="credential_id" defaultValue={item?.credential_id || ''} placeholder="e.g., AWS-12345" className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm" />
+                     </div>
+                     <div>
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Credential URL</label>
+                        <input name="credential_url" type="url" defaultValue={item?.credential_url || ''} placeholder="https://..." className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm" />
+                     </div>
+                 </div>
+             </div>
+             
+             <div>
+                 <ImageUpload 
+                   initialImage={item?.cover_image_url} 
+                   onImageChange={setImageFile} 
+                   label="Certificate Image" 
+                   aspectRatio="video"
+                 />
+             </div>
          </div>
          <div className="flex items-center justify-between mt-6 pt-4 border-t border-black/10 dark:border-white/10">
             <label className="flex items-center gap-2 text-sm">
@@ -105,8 +128,8 @@ export function CertificationsManager({ items }: { items: Certification[] }) {
           <div key={item.id} className="relative">
              {editingId === item.id ? (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                   <div className="w-full max-w-xl bg-[var(--bg)] rounded-xl shadow-xl overflow-hidden">
-                      <CertForm item={item} onSubmit={(e: any) => handleEdit(item.id, e)} onCancel={() => setEditingId(null)} />
+                    <div className="w-full max-w-4xl bg-[var(--bg)] rounded-xl shadow-xl overflow-hidden">
+                      <CertForm item={item} onSubmit={(e: any, file: any) => handleEdit(item.id, e, file)} onCancel={() => setEditingId(null)} />
                    </div>
                 </div>
              ) : (

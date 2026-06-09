@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Reveal, StaggerChildren, StaggerItem } from "@/components/ui/Reveal";
 import { cn } from "@/lib/utils";
 import type { Activity } from "@/lib/types/database";
@@ -53,10 +54,16 @@ export function ActivitiesList({ initialActivities }: { initialActivities: Activ
         {filtered.map((activity) => (
           <StaggerItem key={activity.id}>
             <div className="rounded-xl border p-6 h-full flex gap-4" style={{ background: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "var(--shadow-sm)" }}>
-              {/* Icon */}
-              <div className="w-12 h-12 rounded-md flex-shrink-0 flex items-center justify-center text-xl" style={{ background: "var(--bg-surface-2)", border: "1px solid var(--border)" }}>
-                {categoryEmoji[activity.type] || "📍"}
-              </div>
+              {/* Image or Icon */}
+              {activity.cover_image_url ? (
+                <div className="w-16 h-16 rounded-md flex-shrink-0 relative overflow-hidden" style={{ border: "1px solid var(--border)" }}>
+                  <Image src={activity.cover_image_url} alt={activity.title} fill className="object-cover" sizes="64px" />
+                </div>
+              ) : (
+                <div className="w-16 h-16 rounded-md flex-shrink-0 flex items-center justify-center text-2xl" style={{ background: "var(--bg-surface-2)", border: "1px solid var(--border)" }}>
+                  {categoryEmoji[activity.type] || "📍"}
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="badge badge-default">{categoryLabels[activity.type] || activity.type}</span>

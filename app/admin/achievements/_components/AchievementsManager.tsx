@@ -83,10 +83,28 @@ export function AchievementsManager({ items }: { items: Achievement[] }) {
                     <input name="title" required defaultValue={item?.title} placeholder="e.g., 1st Place - Global Hackathon" className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm" />
                  </div>
                  
+                 <div className="grid grid-cols-2 gap-4 mb-4">
+                     <div>
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Issuer *</label>
+                        <input name="issuer" required defaultValue={item?.issuer} placeholder="e.g., Google, University..." className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm" />
+                     </div>
+                     <div>
+                        <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Category *</label>
+                        <select name="category" required defaultValue={item?.category || 'award'} className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm text-[var(--text-secondary)]">
+                            <option value="award">Award</option>
+                            <option value="recognition">Recognition</option>
+                            <option value="competition">Competition</option>
+                            <option value="scholarship">Scholarship</option>
+                            <option value="honor">Honor</option>
+                            <option value="academic">Academic</option>
+                        </select>
+                     </div>
+                 </div>
+                 
                  <div className="grid grid-cols-2 gap-4">
                      <div>
                         <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Date Achieved *</label>
-                        <input name="date_achieved" type="date" required defaultValue={item?.date_achieved} className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm text-[var(--text-secondary)]" />
+                        <input name="awarded_date" type="date" required defaultValue={item?.awarded_date} className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50 text-sm text-[var(--text-secondary)]" />
                      </div>
                      <div>
                         <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">URL (Optional)</label>

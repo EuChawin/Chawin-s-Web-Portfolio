@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Reveal, StaggerChildren, StaggerItem } from "@/components/ui/Reveal";
 import { ExternalLink } from "lucide-react";
+import Image from "next/image";
 import { getPublishedCertifications } from "@/lib/supabase/queries";
 import { formatDateShort } from "@/lib/utils/slug";
 
@@ -32,9 +33,15 @@ export default async function CertificationsPage() {
             <StaggerItem key={cert.id}>
               <div className="rounded-xl border p-6 h-full flex flex-col" style={{ background: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "var(--shadow-sm)" }}>
                 {/* Image / Icon placeholder */}
-                <div className="w-12 h-12 rounded-md mb-5 flex items-center justify-center text-xl" style={{ background: "var(--bg-surface-2)", border: "1px solid var(--border)" }}>
-                  🏅
-                </div>
+                {cert.cover_image_url ? (
+                  <div className="w-16 h-16 rounded-md mb-5 relative overflow-hidden" style={{ border: "1px solid var(--border)" }}>
+                     <Image src={cert.cover_image_url} alt={cert.name} fill className="object-cover" sizes="64px" />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 rounded-md mb-5 flex items-center justify-center text-xl" style={{ background: "var(--bg-surface-2)", border: "1px solid var(--border)" }}>
+                    🏅
+                  </div>
+                )}
                 <div className="flex-1">
                   <h3 className="font-medium text-body-lg mb-1" style={{ color: "var(--text-primary)" }}>{cert.name}</h3>
                   <p className="text-body-sm mb-3" style={{ color: "var(--text-secondary)" }}>{cert.issuer}</p>

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { uploadFile } from '@/lib/supabase/storage'
 import { adminGetCertifications } from '@/lib/supabase/admin-queries'
 
 async function requireAuth() {
@@ -18,14 +19,24 @@ export async function addCertification(formData: FormData) {
   await requireAuth()
   const supabase = await createClient()
 
+  let cover_image_url: string | undefined
+  const imageFile = formData.get('image') as File | null
+  if (imageFile && imageFile.size > 0) {
+    const path = `certifications/${Date.now()}-${imageFile.name}`
+    const result = await uploadFile('certification-images', path, imageFile, imageFile.type)
+    if ('url' in result) cover_image_url = result.url
+  }
+
   const { error } = await supabase.from('certifications').insert({
     name:            formData.get('name') as string,
     issuer:          formData.get('issuer') as string,
     issue_date:      formData.get('issue_date') as string,
-    expiration_date: formData.get('expiration_date') as string || undefined,
+    expiry_date:     formData.get('expiry_date') as string || undefined,
     credential_id:   formData.get('credential_id') as string || undefined,
     credential_url:  formData.get('credential_url') as string || undefined,
+    cover_image_url,
     is_published:    formData.get('is_published') === 'true',
+    display_order:   parseInt(formData.get('display_order') as string) || 0,
   })
 
   if (error) return { error: error.message }
@@ -38,15 +49,24 @@ export async function updateCertification(id: string, formData: FormData) {
   await requireAuth()
   const supabase = await createClient()
 
-  const { error } = await supabase.from('certifications').update({
+  const updateData: any = {
     name:            formData.get('name') as string,
     issuer:          formData.get('issuer') as string,
     issue_date:      formData.get('issue_date') as string,
-    expiration_date: formData.get('expiration_date') as string || null,
+    expiry_date:     formData.get('expiry_date') as string || null,
     credential_id:   formData.get('credential_id') as string || null,
     credential_url:  formData.get('credential_url') as string || null,
     is_published:    formData.get('is_published') === 'true',
-  }).eq('id', id)
+  }
+
+  const imageFile = formData.get('image') as File | null
+  if (imageFile && imageFile.size > 0) {
+    const path = `certifications/${Date.now()}-${imageFile.name}`
+    const result = await uploadFile('certification-images', path, imageFile, imageFile.type)
+    if ('url' in result) updateData.cover_image_url = result.url
+  }
+
+  const { error } = await supabase.from('certifications').update(updateData).eq('id', id)
 
   if (error) return { error: error.message }
   revalidatePath('/admin/certifications')

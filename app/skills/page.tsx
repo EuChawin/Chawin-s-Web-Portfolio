@@ -6,52 +6,35 @@ export const metadata: Metadata = {
   description: "Technical and professional skills of Chawin Phaikeaw across programming, AI, robotics, and leadership.",
 };
 
-const skillCategories = [
-  {
-    name: "Programming",
-    emoji: "💻",
-    description: "Languages and paradigms I work with fluently.",
-    skills: ["Python", "C++", "TypeScript", "JavaScript", "SQL", "MATLAB", "Bash"],
-  },
-  {
-    name: "AI & Machine Learning",
-    emoji: "🧠",
-    description: "Tools and frameworks for building intelligent systems.",
-    skills: ["TensorFlow", "PyTorch", "Scikit-learn", "OpenCV", "LangChain", "Hugging Face", "YOLO", "NumPy", "Pandas"],
-  },
-  {
-    name: "Robotics",
-    emoji: "🤖",
-    description: "Platforms and tools for building autonomous systems.",
-    skills: ["ROS", "ROS2", "Arduino", "Raspberry Pi", "Embedded C", "SLAM", "Path Planning", "Sensor Fusion"],
-  },
-  {
-    name: "Engineering & Dev Tools",
-    emoji: "⚙️",
-    description: "Infrastructure, tools, and development environment.",
-    skills: ["Git", "Linux", "Docker", "Next.js", "Supabase", "PostgreSQL", "REST APIs", "Vercel"],
-  },
-  {
-    name: "Leadership",
-    emoji: "🎯",
-    description: "Skills developed through real experience leading teams.",
-    skills: ["Team Management", "Strategic Planning", "Event Organization", "Mentoring", "Decision Making"],
-  },
-  {
-    name: "Communication",
-    emoji: "🗣️",
-    description: "Conveying complex ideas clearly and confidently.",
-    skills: ["Technical Writing", "Public Speaking", "Presentation", "Cross-cultural Communication", "English", "Thai"],
-  },
-  {
-    name: "Project Management",
-    emoji: "📋",
-    description: "Methodologies and practices for delivering results.",
-    skills: ["Agile / Scrum", "Project Planning", "Stakeholder Communication", "Documentation", "Risk Management"],
-  },
-];
+import { getPublishedSkills } from "@/lib/supabase/queries";
 
-export default function SkillsPage() {
+const categoryMeta: Record<string, { name: string, emoji: string, description: string }> = {
+  language: { name: "Programming", emoji: "💻", description: "Languages and paradigms I work with fluently." },
+  ai_ml: { name: "AI & Machine Learning", emoji: "🧠", description: "Tools and frameworks for building intelligent systems." },
+  robotics: { name: "Robotics", emoji: "🤖", description: "Platforms and tools for building autonomous systems." },
+  engineering: { name: "Engineering", emoji: "⚙️", description: "Infrastructure, tools, and development environment." },
+  soft: { name: "Leadership", emoji: "🎯", description: "Skills developed through real experience leading teams." },
+  concept: { name: "Concepts & Patterns", emoji: "🗣️", description: "Conveying complex ideas clearly and confidently." },
+  platform: { name: "Platforms", emoji: "☁️", description: "Cloud platforms and operating systems." },
+  framework: { name: "Frameworks", emoji: "⚛️", description: "Libraries and frameworks for building applications." },
+  tool: { name: "Tools", emoji: "🛠️", description: "Development tools and utilities." },
+};
+
+const categoryOrder = ["language", "ai_ml", "robotics", "framework", "tool", "platform", "engineering", "concept", "soft"];
+
+  export const revalidate = 3600;
+
+export default async function SkillsPage() {
+  const skills = await getPublishedSkills();
+
+  const groupedSkills = skills.reduce((acc, skill) => {
+    if (!acc[skill.category]) acc[skill.category] = [];
+    acc[skill.category].push(skill);
+    return acc;
+  }, {} as Record<string, typeof skills>);
+  
+  const activeCategories = categoryOrder.filter(cat => groupedSkills[cat]);
+
   return (
     <div className="section-padding">
       <div className="container-main">
@@ -71,34 +54,44 @@ export default function SkillsPage() {
         </Reveal>
 
         <div className="flex flex-col gap-12">
-          {skillCategories.map((cat, i) => (
-            <Reveal key={cat.name} delay={i * 0.05}>
-              <div>
-                {/* Category header */}
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-2xl">{cat.emoji}</span>
-                  <h2 className="font-serif text-h3" style={{ color: "var(--text-primary)" }}>{cat.name}</h2>
+          {activeCategories.map((catKey, i) => {
+            const meta = categoryMeta[catKey] || { name: catKey, emoji: "✨", description: "" };
+            const catSkills = groupedSkills[catKey];
+            
+            return (
+              <Reveal key={catKey} delay={i * 0.05}>
+                <div>
+                  {/* Category header */}
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-2xl">{meta.emoji}</span>
+                    <h2 className="font-serif text-h3" style={{ color: "var(--text-primary)" }}>{meta.name}</h2>
+                  </div>
+                  <p className="text-body-sm mb-5 ml-9" style={{ color: "var(--text-tertiary)" }}>{meta.description}</p>
+  
+                  {/* Skill chips */}
+                  <div className="ml-9 flex flex-wrap gap-2">
+                    {catSkills.map((skill) => (
+                      <span
+                        key={skill.id}
+                        className="skill-chip"
+                      >
+                        {skill.name}
+                      </span>
+                    ))}
+                  </div>
+  
+                  {i < activeCategories.length - 1 && (
+                    <div className="divider mt-10" />
+                  )}
                 </div>
-                <p className="text-body-sm mb-5 ml-9" style={{ color: "var(--text-tertiary)" }}>{cat.description}</p>
-
-                {/* Skill chips */}
-                <div className="ml-9 flex flex-wrap gap-2">
-                  {cat.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="skill-chip"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-
-                {i < skillCategories.length - 1 && (
-                  <div className="divider mt-10" />
-                )}
-              </div>
-            </Reveal>
-          ))}
+              </Reveal>
+            );
+          })}
+          {activeCategories.length === 0 && (
+            <div className="text-center py-16 text-[var(--text-tertiary)] italic border border-dashed border-[var(--border)] rounded-xl">
+               No skills found. Add some from the CMS!
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -30,9 +30,11 @@ export async function addAchievement(formData: FormData) {
   const { error } = await supabase.from('achievements').insert({
     title:         formData.get('title') as string,
     description:   formData.get('description') as string,
-    date_achieved: formData.get('date_achieved') as string,
+    awarded_date:  formData.get('awarded_date') as string,
     url:           formData.get('url') as string || undefined,
-    image_url,
+    issuer:        formData.get('issuer') as string,
+    category:      formData.get('category') as any,
+    cover_image_url: image_url,
     is_published:  formData.get('is_published') === 'true',
     display_order: parseInt(formData.get('display_order') as string) || 0,
   })
@@ -50,8 +52,10 @@ export async function updateAchievement(id: string, formData: FormData) {
   const updateData: any = {
     title:         formData.get('title') as string,
     description:   formData.get('description') as string,
-    date_achieved: formData.get('date_achieved') as string,
+    awarded_date:  formData.get('awarded_date') as string,
     url:           formData.get('url') as string || null,
+    issuer:        formData.get('issuer') as string,
+    category:      formData.get('category') as string,
     is_published:  formData.get('is_published') === 'true',
   }
 
@@ -59,7 +63,7 @@ export async function updateAchievement(id: string, formData: FormData) {
   if (imageFile && imageFile.size > 0) {
     const path = `achievements/${Date.now()}-${imageFile.name}`
     const result = await uploadFile('achievement-images', path, imageFile, imageFile.type)
-    if ('url' in result) updateData.image_url = result.url
+    if ('url' in result) updateData.cover_image_url = result.url
   }
 
   const { error } = await supabase.from('achievements').update(updateData).eq('id', id)
@@ -75,11 +79,11 @@ export async function deleteAchievement(id: string) {
   const supabase = await createClient()
 
   // Find image to delete
-  const { data: item } = await supabase.from('achievements').select('image_url').eq('id', id).single()
+  const { data: item } = await supabase.from('achievements').select('cover_image_url').eq('id', id).single()
   
-  if (item?.image_url) {
+  if (item?.cover_image_url) {
     try {
-        const urlObj = new URL(item.image_url)
+        const urlObj = new URL(item.cover_image_url)
         const pathParts = urlObj.pathname.split('/')
         const fileName = pathParts.pop()
         const folderName = pathParts.pop()
