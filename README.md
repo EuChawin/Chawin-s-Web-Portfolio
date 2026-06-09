@@ -112,9 +112,9 @@ Create a `.env.local` file and configure the required environment variables befo
 Feel free to connect with me through my portfolio website or professional platforms.
 
 * Portfolio: https://euchawin.vercel.app
-* LinkedIn: linkedin.com/in/chawin-phaikeaw-510482319/
+* LinkedIn: https://linkedin.com/in/chawin-phaikeaw-510482319/
 * GitHub: https://github.com/euchawin
-* Email: europhaikeaw@gmail.com(mailto:europhaikeaw@gmail.com)
+* Email: europhaikeaw@gmail.com
 
 ---
 
