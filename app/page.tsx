@@ -6,6 +6,7 @@ import { TimelineSection } from "@/components/sections/TimelineSection";
 import { CurrentlySection } from "@/components/sections/CurrentlySection";
 import { FeaturedProjectsSection } from "@/components/sections/FeaturedProjectsSection";
 import { MilestonesStrip } from "@/components/sections/MilestonesStrip";
+import { RecommendationsPreviewSection } from "@/components/sections/RecommendationsPreviewSection";
 import { getProfile, getCurrentlyItems, getPublishedTimeline, getFeaturedProjects } from "@/lib/supabase/queries";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default async function HomePage() {
       <StorytellingSection />
       <FinlandSection />
       <TimelineSection items={timelineItems} />
+      <RecommendationsPreviewSection />
       <CurrentlySection items={currentlyItems} />
       <FeaturedProjectsSection projects={featuredProjects} />
     </>

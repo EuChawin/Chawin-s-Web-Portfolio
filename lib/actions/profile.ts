@@ -27,7 +27,10 @@ export async function updateProfile(formData: FormData) {
 
   if (avatarFile && avatarFile.size > 0) {
     const result = await uploadFile('profile-images', `${user.id}/avatar.webp`, avatarFile, 'image/webp')
-    if ('url' in result) avatar_url = result.url
+    if ('url' in result) {
+      // Append a timestamp to bypass browser cache
+      avatar_url = `${result.url}?v=${Date.now()}`
+    }
   }
 
   const update: Record<string, unknown> = {

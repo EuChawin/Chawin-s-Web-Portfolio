@@ -21,6 +21,7 @@ const moreLinks = [
   { href: "/skills", label: "Skills" },
   { href: "/gallery", label: "Gallery" },
   { href: "/resume", label: "Resume" },
+  { href: "/recommendations", label: "Recommendations" },
 ];
 
 const allLinks = [...primaryLinks, ...moreLinks];
