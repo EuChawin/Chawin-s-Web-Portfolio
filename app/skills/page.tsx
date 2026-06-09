@@ -1,40 +1,44 @@
 import type { Metadata } from "next";
-import { Reveal, StaggerChildren, StaggerItem } from "@/components/ui/Reveal";
+import { Reveal } from "@/components/ui/Reveal";
 
 export const metadata: Metadata = {
   title: "Skills",
   description: "Technical and professional skills of Chawin Phaikeaw across programming, AI, robotics, and leadership.",
 };
 
-import { getPublishedSkills } from "@/lib/supabase/queries";
+const HARDCODED_SKILLS = [
+  {
+    name: "Programming",
+    emoji: "💻",
+    description: "Languages and paradigms I work with fluently.",
+    skills: ["Python", "JavaScript", "HTML", "CSS", "SQL"],
+  },
+  {
+    name: "AI & Engineering",
+    emoji: "🧠",
+    description: "Tools and frameworks for building intelligent systems and prototypes.",
+    skills: ["Machine Learning", "Computer Vision", "Data Analysis", "Arduino", "AI Prototyping", "Prompt Engineering"],
+  },
+  {
+    name: "Tools & Technologies",
+    emoji: "🛠️",
+    description: "Development tools, utilities, and platforms.",
+    skills: ["Git & GitHub", "Supabase", "Next.js", "Tailwind CSS", "Vercel"],
+  },
+  {
+    name: "Professional Skills",
+    emoji: "🎯",
+    description: "Skills developed through real experience leading teams and organizing events.",
+    skills: ["Leadership", "Public Speaking", "Teamwork", "Event Organization", "Project Management", "Problem Solving"],
+  },
+];
 
-const categoryMeta: Record<string, { name: string, emoji: string, description: string }> = {
-  language: { name: "Programming", emoji: "💻", description: "Languages and paradigms I work with fluently." },
-  ai_ml: { name: "AI & Machine Learning", emoji: "🧠", description: "Tools and frameworks for building intelligent systems." },
-  robotics: { name: "Robotics", emoji: "🤖", description: "Platforms and tools for building autonomous systems." },
-  engineering: { name: "Engineering", emoji: "⚙️", description: "Infrastructure, tools, and development environment." },
-  soft: { name: "Leadership", emoji: "🎯", description: "Skills developed through real experience leading teams." },
-  concept: { name: "Concepts & Patterns", emoji: "🗣️", description: "Conveying complex ideas clearly and confidently." },
-  platform: { name: "Platforms", emoji: "☁️", description: "Cloud platforms and operating systems." },
-  framework: { name: "Frameworks", emoji: "⚛️", description: "Libraries and frameworks for building applications." },
-  tool: { name: "Tools", emoji: "🛠️", description: "Development tools and utilities." },
-};
+const INTERESTS = [
+  "Artificial Intelligence", "Robotics", "Entrepreneurship", "Investing", 
+  "Piano", "Guitar", "Badminton", "Basketball"
+];
 
-const categoryOrder = ["language", "ai_ml", "robotics", "framework", "tool", "platform", "engineering", "concept", "soft"];
-
-  export const revalidate = 3600;
-
-export default async function SkillsPage() {
-  const skills = await getPublishedSkills();
-
-  const groupedSkills = skills.reduce((acc, skill) => {
-    if (!acc[skill.category]) acc[skill.category] = [];
-    acc[skill.category].push(skill);
-    return acc;
-  }, {} as Record<string, typeof skills>);
-  
-  const activeCategories = categoryOrder.filter(cat => groupedSkills[cat]);
-
+export default function SkillsPage() {
   return (
     <div className="section-padding">
       <div className="container-main">
@@ -54,45 +58,61 @@ export default async function SkillsPage() {
         </Reveal>
 
         <div className="flex flex-col gap-12">
-          {activeCategories.map((catKey, i) => {
-            const meta = categoryMeta[catKey] || { name: catKey, emoji: "✨", description: "" };
-            const catSkills = groupedSkills[catKey];
-            
-            return (
-              <Reveal key={catKey} delay={i * 0.05}>
-                <div>
-                  {/* Category header */}
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-2xl">{meta.emoji}</span>
-                    <h2 className="font-serif text-h3" style={{ color: "var(--text-primary)" }}>{meta.name}</h2>
-                  </div>
-                  <p className="text-body-sm mb-5 ml-9" style={{ color: "var(--text-tertiary)" }}>{meta.description}</p>
-  
-                  {/* Skill chips */}
-                  <div className="ml-9 flex flex-wrap gap-2">
-                    {catSkills.map((skill) => (
-                      <span
-                        key={skill.id}
-                        className="skill-chip"
-                      >
-                        {skill.name}
-                      </span>
-                    ))}
-                  </div>
-  
-                  {i < activeCategories.length - 1 && (
-                    <div className="divider mt-10" />
-                  )}
+          {HARDCODED_SKILLS.map((category, i) => (
+            <Reveal key={category.name} delay={i * 0.05}>
+              <div>
+                {/* Category header */}
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl">{category.emoji}</span>
+                  <h2 className="font-serif text-h3" style={{ color: "var(--text-primary)" }}>{category.name}</h2>
                 </div>
-              </Reveal>
-            );
-          })}
-          {activeCategories.length === 0 && (
-            <div className="text-center py-16 text-[var(--text-tertiary)] italic border border-dashed border-[var(--border)] rounded-xl">
-               No skills found. Add some from the CMS!
-            </div>
-          )}
+                <p className="text-body-sm mb-5 ml-9" style={{ color: "var(--text-tertiary)" }}>{category.description}</p>
+
+                {/* Skill chips */}
+                <div className="ml-9 flex flex-wrap gap-2">
+                  {category.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="skill-chip"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+
+                {i < HARDCODED_SKILLS.length - 1 && (
+                  <div className="divider mt-10" />
+                )}
+              </div>
+            </Reveal>
+          ))}
         </div>
+
+        <div className="mt-20">
+           <Reveal delay={0.3}>
+              <h2 className="font-serif text-h2 mb-4" style={{ color: "var(--text-primary)" }}>Interests & Hobbies.</h2>
+              <p className="text-body-sm mb-6 max-w-xl" style={{ color: "var(--text-secondary)" }}>
+                Beyond the screen, I'm passionate about building things, making music, and staying active. These interests help me maintain a balanced perspective and often inspire my technical projects.
+              </p>
+              
+              <div className="flex flex-wrap gap-3">
+                 {INTERESTS.map((interest) => (
+                    <span 
+                       key={interest} 
+                       className="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+                       style={{ 
+                          backgroundColor: "var(--bg-surface-2)", 
+                          color: "var(--text-primary)",
+                          border: "1px solid var(--border)"
+                       }}
+                    >
+                       {interest}
+                    </span>
+                 ))}
+              </div>
+           </Reveal>
+        </div>
+
       </div>
     </div>
   );

@@ -21,7 +21,6 @@ const navItems = [
   { href: '/admin/blog', label: 'Blog', icon: PenTool },
   { href: '/admin/certifications', label: 'Certifications', icon: Award },
   { href: '/admin/achievements', label: 'Achievements', icon: Trophy },
-  { href: '/admin/skills', label: 'Skills', icon: Settings },
   { href: '/admin/timeline', label: 'Timeline', icon: Clock },
   { href: '/admin/gallery', label: 'Gallery', icon: ImageIcon },
   { href: '/admin/resume', label: 'Resume', icon: FileText },
