@@ -6,7 +6,17 @@ import { PlusCircle, Edit, Trash2, Loader2, GripVertical } from 'lucide-react'
 import { addSkill, updateSkill, deleteSkill, reorderSkills } from '@/lib/actions/skills'
 import type { Skill } from '@/lib/types/database'
 
-const SKILL_CATEGORIES = ['Languages', 'Frameworks', 'Tools', 'Hardware', 'Soft Skills']
+const SKILL_CATEGORIES = [
+  { value: 'language', label: 'Language' },
+  { value: 'framework', label: 'Framework' },
+  { value: 'tool', label: 'Tool' },
+  { value: 'platform', label: 'Platform' },
+  { value: 'ai_ml', label: 'AI & ML' },
+  { value: 'robotics', label: 'Robotics' },
+  { value: 'engineering', label: 'Engineering' },
+  { value: 'concept', label: 'Concept' },
+  { value: 'soft', label: 'Soft Skill' },
+]
 
 export function SkillsManager({ initialSkills }: { initialSkills: Skill[] }) {
   const router = useRouter()
@@ -15,8 +25,8 @@ export function SkillsManager({ initialSkills }: { initialSkills: Skill[] }) {
   const [isSaving, setIsSaving] = useState(false)
   
   // Group skills by category for display
-  const skillsByCategory = SKILL_CATEGORIES.reduce((acc, category) => {
-    acc[category] = initialSkills.filter(s => s.category === category).sort((a, b) => a.display_order - b.display_order)
+  const skillsByCategory = SKILL_CATEGORIES.reduce((acc, cat) => {
+    acc[cat.value] = initialSkills.filter(s => s.category === cat.value).sort((a, b) => a.display_order - b.display_order)
     return acc
   }, {} as Record<string, Skill[]>)
   
@@ -24,7 +34,7 @@ export function SkillsManager({ initialSkills }: { initialSkills: Skill[] }) {
   const knownCategorySkills = new Set(Object.values(skillsByCategory).flat().map(s => s.id))
   const otherSkills = initialSkills.filter(s => !knownCategorySkills.has(s.id)).sort((a, b) => a.display_order - b.display_order)
   if (otherSkills.length > 0) {
-      skillsByCategory['Other'] = otherSkills
+      skillsByCategory['other'] = otherSkills
   }
 
   const handleAdd = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,8 +46,15 @@ export function SkillsManager({ initialSkills }: { initialSkills: Skill[] }) {
       // Put at the end of the selected category
       const order = (skillsByCategory[category]?.length || 0)
       formData.append('display_order', order.toString())
+      // Fix checkbox: set explicitly as 'true'/'false'
+      const isPublished = (e.currentTarget.querySelector('[name=is_published]') as HTMLInputElement)?.checked
+      formData.set('is_published', isPublished ? 'true' : 'false')
       
-      await addSkill(formData)
+      const result = await addSkill(formData)
+      if (result?.error) {
+        alert('Error: ' + result.error)
+        return
+      }
       setIsAdding(false)
       router.refresh()
     } finally {
@@ -100,9 +117,8 @@ export function SkillsManager({ initialSkills }: { initialSkills: Skill[] }) {
               </div>
               <div>
                  <select name="category" required className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50">
-                    {SKILL_CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                    <option value="Other">Other</option>
-                 </select>
+                     {SKILL_CATEGORIES.map(cat => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
+                  </select>
               </div>
               <div>
                  <input name="proficiency" type="number" min="1" max="100" placeholder="Proficiency % (optional)" className="w-full px-3 py-2 rounded border bg-white dark:bg-black/50" />
@@ -123,11 +139,11 @@ export function SkillsManager({ initialSkills }: { initialSkills: Skill[] }) {
       )}
 
       {Object.entries(skillsByCategory).map(([category, items]) => {
-         if (items.length === 0 && category !== 'Other') return null
+         if (items.length === 0) return null
          
          return (
            <div key={category} className="mb-8">
-             <h3 className="font-medium text-[var(--text-secondary)] uppercase tracking-wider text-xs mb-3">{category}</h3>
+             <h3 className="font-medium text-[var(--text-secondary)] uppercase tracking-wider text-xs mb-3">{SKILL_CATEGORIES.find(c => c.value === category)?.label ?? category}</h3>
              
              <div className="card divide-y divide-[var(--border)]">
                {items.map((item, index) => (
@@ -140,9 +156,8 @@ export function SkillsManager({ initialSkills }: { initialSkills: Skill[] }) {
                            </div>
                            <div>
                               <select name="category" required defaultValue={item.category} className="w-full px-3 py-2 rounded border bg-[var(--bg)]">
-                                 {SKILL_CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                                 <option value="Other">Other</option>
-                              </select>
+                                  {SKILL_CATEGORIES.map(cat => <option key={cat.value} value={cat.value}>{cat.label}</option>)}
+                               </select>
                            </div>
                         </div>
                         <input type="hidden" name="display_order" value={item.display_order} />

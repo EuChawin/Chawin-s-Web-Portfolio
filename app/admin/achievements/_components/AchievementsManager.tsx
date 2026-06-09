@@ -14,13 +14,14 @@ export function AchievementsManager({ items }: { items: Achievement[] }) {
   const [isAdding, setIsAdding] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
-  const handleAdd = async (e: React.FormEvent<HTMLFormElement>, imageFile: File | null) => {
+  const handleAdd = async (e: React.FormEvent<HTMLFormElement>, imageFile: File | null, isPublished: boolean) => {
     e.preventDefault()
     setIsSaving(true)
     try {
       const formData = new FormData(e.currentTarget)
       if (imageFile) formData.append('image', imageFile)
       formData.append('display_order', items.length.toString())
+      formData.set('is_published', isPublished ? 'true' : 'false')
       
       await addAchievement(formData)
       setIsAdding(false)
@@ -30,12 +31,13 @@ export function AchievementsManager({ items }: { items: Achievement[] }) {
     }
   }
 
-  const handleEdit = async (id: string, e: React.FormEvent<HTMLFormElement>, imageFile: File | null) => {
+  const handleEdit = async (id: string, e: React.FormEvent<HTMLFormElement>, imageFile: File | null, isPublished: boolean) => {
     e.preventDefault()
     setIsSaving(true)
     try {
       const formData = new FormData(e.currentTarget)
       if (imageFile) formData.append('image', imageFile)
+      formData.set('is_published', isPublished ? 'true' : 'false')
       
       await updateAchievement(id, formData)
       setEditingId(null)
@@ -71,9 +73,10 @@ export function AchievementsManager({ items }: { items: Achievement[] }) {
 
   const AchievementForm = ({ item, onSubmit, onCancel }: any) => {
     const [imageFile, setImageFile] = useState<File | null>(null)
+    const [isPublished, setIsPublished] = useState<boolean>(item ? item.is_published : true)
     
     return (
-      <form onSubmit={(e) => onSubmit(e, imageFile)} className="card p-5 border-[var(--accent)] bg-[var(--accent-muted)] mb-8">
+      <form onSubmit={(e) => onSubmit(e, imageFile, isPublished)} className="card p-5 border-[var(--accent)] bg-[var(--accent-muted)] mb-8">
          <h3 className="font-medium mb-4">{item ? 'Edit Achievement' : 'New Achievement'}</h3>
          
          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
@@ -129,8 +132,8 @@ export function AchievementsManager({ items }: { items: Achievement[] }) {
          </div>
 
          <div className="flex items-center justify-between mt-6 pt-4 border-t border-black/10 dark:border-white/10">
-            <label className="flex items-center gap-2 text-sm">
-               <input type="checkbox" name="is_published" defaultChecked={item ? item.is_published : true} className="rounded" /> Published
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+               <input type="checkbox" checked={isPublished} onChange={e => setIsPublished(e.target.checked)} className="rounded" /> Published
             </label>
             <div className="flex gap-2">
                <button type="button" onClick={onCancel} className="px-3 py-1.5 text-sm hover:bg-black/5 rounded">Cancel</button>
@@ -158,7 +161,7 @@ export function AchievementsManager({ items }: { items: Achievement[] }) {
           <div key={item.id} className="relative">
              {editingId === item.id ? (
                 <div className="bg-[var(--bg-surface)] rounded-xl border p-1 mb-4">
-                   <AchievementForm item={item} onSubmit={(e: any, file: any) => handleEdit(item.id, e, file)} onCancel={() => setEditingId(null)} />
+                   <AchievementForm item={item} onSubmit={(e: any, file: any, pub: boolean) => handleEdit(item.id, e, file, pub)} onCancel={() => setEditingId(null)} />
                 </div>
              ) : (
                 <div className={`card p-5 flex flex-col md:flex-row gap-6 transition-all hover:shadow-md group ${!item.is_published ? 'opacity-60' : ''}`}>

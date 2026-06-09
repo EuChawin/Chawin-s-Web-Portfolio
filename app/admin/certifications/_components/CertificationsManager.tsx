@@ -14,13 +14,14 @@ export function CertificationsManager({ items }: { items: Certification[] }) {
   const [isAdding, setIsAdding] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
-  const handleAdd = async (e: React.FormEvent<HTMLFormElement>, imageFile: File | null) => {
+  const handleAdd = async (e: React.FormEvent<HTMLFormElement>, imageFile: File | null, isPublished: boolean) => {
     e.preventDefault()
     setIsSaving(true)
     try {
       const formData = new FormData(e.currentTarget)
       if (imageFile) formData.append('image', imageFile)
       formData.append('display_order', items.length.toString())
+      formData.set('is_published', isPublished ? 'true' : 'false')
       await addCertification(formData)
       setIsAdding(false)
       router.refresh()
@@ -29,12 +30,13 @@ export function CertificationsManager({ items }: { items: Certification[] }) {
     }
   }
 
-  const handleEdit = async (id: string, e: React.FormEvent<HTMLFormElement>, imageFile: File | null) => {
+  const handleEdit = async (id: string, e: React.FormEvent<HTMLFormElement>, imageFile: File | null, isPublished: boolean) => {
     e.preventDefault()
     setIsSaving(true)
     try {
       const formData = new FormData(e.currentTarget)
       if (imageFile) formData.append('image', imageFile)
+      formData.set('is_published', isPublished ? 'true' : 'false')
       await updateCertification(id, formData)
       setEditingId(null)
       router.refresh()
@@ -51,9 +53,10 @@ export function CertificationsManager({ items }: { items: Certification[] }) {
 
   const CertForm = ({ item, onSubmit, onCancel }: any) => {
     const [imageFile, setImageFile] = useState<File | null>(null)
+    const [isPublished, setIsPublished] = useState<boolean>(item ? item.is_published : true)
     
     return (
-      <form onSubmit={(e) => onSubmit(e, imageFile)} className="card p-5 border-[var(--accent)] bg-[var(--accent-muted)] mb-8">
+      <form onSubmit={(e) => onSubmit(e, imageFile, isPublished)} className="card p-5 border-[var(--accent)] bg-[var(--accent-muted)] mb-8">
          <h3 className="font-medium mb-4">{item ? 'Edit Certification' : 'New Certification'}</h3>
          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
              <div className="md:col-span-2 space-y-4">
@@ -99,8 +102,8 @@ export function CertificationsManager({ items }: { items: Certification[] }) {
              </div>
          </div>
          <div className="flex items-center justify-between mt-6 pt-4 border-t border-black/10 dark:border-white/10">
-            <label className="flex items-center gap-2 text-sm">
-               <input type="checkbox" name="is_published" defaultChecked={item ? item.is_published : true} className="rounded" /> Published
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+               <input type="checkbox" checked={isPublished} onChange={e => setIsPublished(e.target.checked)} className="rounded" /> Published
             </label>
             <div className="flex gap-2">
                <button type="button" onClick={onCancel} className="px-3 py-1.5 text-sm hover:bg-black/5 rounded">Cancel</button>
@@ -129,7 +132,7 @@ export function CertificationsManager({ items }: { items: Certification[] }) {
              {editingId === item.id ? (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
                     <div className="w-full max-w-4xl bg-[var(--bg)] rounded-xl shadow-xl overflow-hidden">
-                      <CertForm item={item} onSubmit={(e: any, file: any) => handleEdit(item.id, e, file)} onCancel={() => setEditingId(null)} />
+                      <CertForm item={item} onSubmit={(e: any, file: any, pub: boolean) => handleEdit(item.id, e, file, pub)} onCancel={() => setEditingId(null)} />
                    </div>
                 </div>
              ) : (

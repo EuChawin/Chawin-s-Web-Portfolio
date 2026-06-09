@@ -53,30 +53,41 @@ export function ActivitiesList({ initialActivities }: { initialActivities: Activ
       <StaggerChildren className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {filtered.map((activity) => (
           <StaggerItem key={activity.id}>
-            <div className="rounded-xl border p-6 h-full flex gap-4" style={{ background: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "var(--shadow-sm)" }}>
-              {/* Image or Icon */}
+            <div className="rounded-xl border overflow-hidden h-full flex flex-col" style={{ background: "var(--bg-surface)", borderColor: "var(--border)", boxShadow: "var(--shadow-sm)" }}>
+              {/* Card Image / Banner */}
               {activity.cover_image_url ? (
-                <div className="w-16 h-16 rounded-md flex-shrink-0 relative overflow-hidden" style={{ border: "1px solid var(--border)" }}>
-                  <Image src={activity.cover_image_url} alt={activity.title} fill className="object-cover" sizes="64px" />
+                <div className="w-full aspect-video relative overflow-hidden bg-[var(--bg-surface-2)]">
+                  <Image
+                    src={activity.cover_image_url}
+                    alt={activity.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
                 </div>
               ) : (
-                <div className="w-16 h-16 rounded-md flex-shrink-0 flex items-center justify-center text-2xl" style={{ background: "var(--bg-surface-2)", border: "1px solid var(--border)" }}>
+                <div
+                  className="w-full aspect-video flex items-center justify-center text-5xl"
+                  style={{ background: "linear-gradient(135deg, var(--bg-surface-2), var(--bg-surface))" }}
+                >
                   {categoryEmoji[activity.type] || "📍"}
                 </div>
               )}
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-2">
+
+              {/* Card Body */}
+              <div className="p-5 flex-1 flex flex-col">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
                   <span className="badge badge-default">{categoryLabels[activity.type] || activity.type}</span>
                   <span className="text-caption" style={{ color: "var(--text-tertiary)" }}>
                     {formatDateShort(activity.start_date)} {activity.end_date ? `— ${formatDateShort(activity.end_date)}` : ""}
                   </span>
                 </div>
                 <h3 className="font-medium text-body-lg mb-2" style={{ color: "var(--text-primary)" }}>{activity.title}</h3>
-                <p className="text-body-sm" style={{ color: "var(--text-secondary)", lineHeight: "1.65" }}>{activity.description}</p>
+                <p className="text-body-sm flex-1" style={{ color: "var(--text-secondary)", lineHeight: "1.65" }}>{activity.description}</p>
                 {activity.url && (
-                   <a href={activity.url} target="_blank" rel="noreferrer" className="inline-block mt-3 text-sm text-[var(--accent)] hover:underline">
-                      View Activity →
-                   </a>
+                  <a href={activity.url} target="_blank" rel="noreferrer" className="inline-block mt-4 text-sm text-[var(--accent)] hover:underline">
+                    View Activity →
+                  </a>
                 )}
               </div>
             </div>
