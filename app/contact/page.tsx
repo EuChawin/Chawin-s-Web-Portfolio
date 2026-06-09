@@ -19,17 +19,10 @@ export default function ContactPage() {
     e.preventDefault();
     setFormState("submitting");
 
-    // Formspree endpoint (User will replace with actual ID)
     const formUrl = "https://formspree.io/f/mpqerpgb";
     const formData = new FormData(e.currentTarget);
 
     try {
-      // Simulate form submission for now since we don't have a real ID
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setFormState("success");
-      (e.target as HTMLFormElement).reset();
-
-      /* Real implementation:
       const response = await fetch(formUrl, {
         method: "POST",
         body: formData,
@@ -37,7 +30,6 @@ export default function ContactPage() {
       });
       if (response.ok) setFormState("success");
       else setFormState("error");
-      */
     } catch (err) {
       setFormState("error");
     }
