@@ -10,19 +10,19 @@ const HARDCODED_SKILLS = [
   {
     name: "Programming",
     emoji: "💻",
-    description: "Languages and paradigms I work with fluently.",
+    description: "Languages and technologies I've used across projects, coursework, and self-learning.",
     skills: ["Python", "JavaScript", "HTML", "CSS", "SQL"],
   },
   {
     name: "AI & Engineering",
     emoji: "🧠",
-    description: "Tools and frameworks for building intelligent systems and prototypes.",
+    description: "Areas I've explored through projects, competitions, and hands-on experimentation.",
     skills: ["Machine Learning", "Computer Vision", "Data Analysis", "Arduino", "AI Prototyping", "Prompt Engineering"],
   },
   {
     name: "Tools & Technologies",
     emoji: "🛠️",
-    description: "Development tools, utilities, and platforms.",
+    description: "Technologies I've used to build, deploy, and manage projects.",
     skills: ["Git & GitHub", "Supabase", "Next.js", "Tailwind CSS", "Vercel"],
   },
   {
@@ -34,7 +34,7 @@ const HARDCODED_SKILLS = [
 ];
 
 const INTERESTS = [
-  "Artificial Intelligence", "Robotics", "Entrepreneurship", "Investing", 
+  "Artificial Intelligence", "Robotics", "Entrepreneurship", "Investing",
   "Piano", "Guitar", "Badminton", "Basketball"
 ];
 
@@ -89,28 +89,28 @@ export default function SkillsPage() {
         </div>
 
         <div className="mt-20">
-           <Reveal delay={0.3}>
-              <h2 className="font-serif text-h2 mb-4" style={{ color: "var(--text-primary)" }}>Interests & Hobbies.</h2>
-              <p className="text-body-sm mb-6 max-w-xl" style={{ color: "var(--text-secondary)" }}>
-                Beyond the screen, I'm passionate about building things, making music, and staying active. These interests help me maintain a balanced perspective and often inspire my technical projects.
-              </p>
-              
-              <div className="flex flex-wrap gap-3">
-                 {INTERESTS.map((interest) => (
-                    <span 
-                       key={interest} 
-                       className="px-4 py-2 rounded-full text-sm font-medium transition-colors"
-                       style={{ 
-                          backgroundColor: "var(--bg-surface-2)", 
-                          color: "var(--text-primary)",
-                          border: "1px solid var(--border)"
-                       }}
-                    >
-                       {interest}
-                    </span>
-                 ))}
-              </div>
-           </Reveal>
+          <Reveal delay={0.3}>
+            <h2 className="font-serif text-h2 mb-4" style={{ color: "var(--text-primary)" }}>Interests & Hobbies.</h2>
+            <p className="text-body-sm mb-6 max-w-xl" style={{ color: "var(--text-secondary)" }}>
+              Outside of academics and technology, I enjoy music, sports, investing, and exploring new ideas. These interests help me stay curious, creative, and balanced.
+            </p>
+
+            <div className="flex flex-wrap gap-3">
+              {INTERESTS.map((interest) => (
+                <span
+                  key={interest}
+                  className="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+                  style={{
+                    backgroundColor: "var(--bg-surface-2)",
+                    color: "var(--text-primary)",
+                    border: "1px solid var(--border)"
+                  }}
+                >
+                  {interest}
+                </span>
+              ))}
+            </div>
+          </Reveal>
         </div>
 
       </div>

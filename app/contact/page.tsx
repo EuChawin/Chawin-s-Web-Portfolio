@@ -20,7 +20,7 @@ export default function ContactPage() {
     setFormState("submitting");
 
     // Formspree endpoint (User will replace with actual ID)
-    const formUrl = "https://formspree.io/f/placeholder-id";
+    const formUrl = "https://formspree.io/f/mpqerpgb";
     const formData = new FormData(e.currentTarget);
 
     try {
