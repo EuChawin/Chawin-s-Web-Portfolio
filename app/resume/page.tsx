@@ -23,12 +23,12 @@ export default async function ResumePage() {
         </Reveal>
         <Reveal delay={0.15}>
           <p className="text-body-lg mb-3" style={{ color: "var(--text-secondary)" }}>
-            My full curriculum vitae — available to view and download.
+            My full curriculum vitae, including education, projects, leadership experiences, and achievements.
           </p>
         </Reveal>
         <Reveal delay={0.2}>
           <p className="text-body-sm mb-10" style={{ color: "var(--text-tertiary)" }}>
-            {activeResume ? `Last updated: ${formatDateShort(activeResume.created_at)}` : "Last updated: will be shown here after upload via CMS."}
+            {activeResume ? `Last updated: ${formatDateShort(activeResume.created_at)}` : "Last updated: Resume currently being updated."}
           </p>
         </Reveal>
 
@@ -75,7 +75,7 @@ export default async function ResumePage() {
                   Resume PDF will appear here
                 </p>
                 <p className="text-body-sm text-center max-w-xs" style={{ color: "var(--text-tertiary)" }}>
-                  Upload your resume through the admin CMS to display it here. The PDF will be embedded and available for download.
+                  My resume is currently being updated and will be available here soon.
                 </p>
               </div>
             )}
