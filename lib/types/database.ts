@@ -267,6 +267,25 @@ export type Database = {
         }
         Update: Partial<Database['public']['Tables']['blog_posts']['Insert']>
       }
+      gallery_categories: {
+        Row: {
+          id: string
+          title: string
+          slug: string
+          description: string | null
+          cover_image_url: string | null
+          sort_order: number
+          is_published: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['gallery_categories']['Row'], 'id' | 'created_at' | 'updated_at'> & {
+          id?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['gallery_categories']['Insert']>
+      }
       gallery: {
         Row: {
           id: string
@@ -278,6 +297,7 @@ export type Database = {
           alt_text: string | null
           tags: string[]
           category: string | null
+          category_id: string | null
           taken_at: string | null
           location: string | null
           is_featured: boolean
@@ -399,6 +419,7 @@ export type Certification = Database['public']['Tables']['certifications']['Row'
 export type Achievement   = Database['public']['Tables']['achievements']['Row']
 export type BlogPost      = Database['public']['Tables']['blog_posts']['Row']
 export type GalleryItem   = Database['public']['Tables']['gallery']['Row']
+export type GalleryCategoryDB = Database['public']['Tables']['gallery_categories']['Row']
 export type ResumeSection = Database['public']['Tables']['resume']['Row']
 export type ResumeFile    = Database['public']['Tables']['resume_files']['Row']
 
@@ -413,6 +434,7 @@ export type CertificationInsert = Database['public']['Tables']['certifications']
 export type AchievementInsert   = Database['public']['Tables']['achievements']['Insert']
 export type BlogPostInsert      = Database['public']['Tables']['blog_posts']['Insert']
 export type GalleryItemInsert   = Database['public']['Tables']['gallery']['Insert']
+export type GalleryCategoryInsert = Database['public']['Tables']['gallery_categories']['Insert']
 export type ResumeSectionInsert = Database['public']['Tables']['resume']['Insert']
 export type ResumeFileInsert    = Database['public']['Tables']['resume_files']['Insert']
 
@@ -427,5 +449,6 @@ export type CertificationUpdate = Database['public']['Tables']['certifications']
 export type AchievementUpdate   = Database['public']['Tables']['achievements']['Update']
 export type BlogPostUpdate      = Database['public']['Tables']['blog_posts']['Update']
 export type GalleryItemUpdate   = Database['public']['Tables']['gallery']['Update']
+export type GalleryCategoryUpdate = Database['public']['Tables']['gallery_categories']['Update']
 export type ResumeSectionUpdate = Database['public']['Tables']['resume']['Update']
 export type ResumeFileUpdate    = Database['public']['Tables']['resume_files']['Update']

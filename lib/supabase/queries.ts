@@ -8,8 +8,9 @@ import { createAnonClient } from '@/lib/supabase/anon'
 import type {
   Profile, Currently, Skill, TimelineItem, Project,
   Activity, Certification, Achievement, BlogPost,
-  GalleryItem, ResumeSection, ResumeFile
+  GalleryCategoryDB, ResumeSection, ResumeFile
 } from '@/lib/types/database'
+import type { GalleryItem } from '@/lib/types'
 
 
 // ─── Profile ─────────────────────────────────────────────────
@@ -164,15 +165,43 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
 }
 
 // ─── Gallery ─────────────────────────────────────────────────
-export async function getPublicGallery(): Promise<GalleryItem[]> {
+export async function getPublishedGalleryCategories(): Promise<GalleryCategoryDB[]> {
   const supabase = createAnonClient()
   const { data } = await supabase
-    .from('gallery')
+    .from('gallery_categories')
     .select('*')
     .eq('is_published', true)
-    .eq('is_public', true)
-    .order('display_order', { ascending: true })
+    .order('sort_order', { ascending: true })
   return data ?? []
+}
+
+export async function getPublicGallery(
+  options?: { page?: number; limit?: number; categoryId?: string }
+): Promise<{ data: GalleryItem[], count: number }> {
+  const supabase = createAnonClient()
+  let query = supabase
+    .from('gallery')
+    .select('*, category_data:gallery_categories(*)', { count: 'exact' })
+    .eq('is_published', true)
+    .eq('is_public', true)
+
+  if (options?.categoryId) {
+    query = query.eq('category_id', options.categoryId)
+  }
+
+  query = query.order('display_order', { ascending: true })
+               .order('created_at', { ascending: false })
+
+  if (options?.page && options?.limit) {
+    const from = (options.page - 1) * options.limit
+    const to = from + options.limit - 1
+    query = query.range(from, to)
+  }
+
+  const { data, count } = await query
+  
+  // Cast data since supabase join types can be tricky
+  return { data: (data as any) ?? [], count: count ?? 0 }
 }
 
 // ─── Resume ──────────────────────────────────────────────────

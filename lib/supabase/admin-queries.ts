@@ -8,14 +8,16 @@ import { createClient } from '@/lib/supabase/server'
 import type {
   Profile, Currently, Skill, TimelineItem, Project,
   Activity, Certification, Achievement, BlogPost,
-  GalleryItem, ResumeSection, ResumeFile,
+  GalleryCategoryDB, ResumeSection, ResumeFile,
   ProfileUpdate, CurrentlyInsert, CurrentlyUpdate,
   SkillInsert, SkillUpdate, TimelineItemInsert, TimelineItemUpdate,
   ProjectInsert, ProjectUpdate, ActivityInsert, ActivityUpdate,
   CertificationInsert, CertificationUpdate, AchievementInsert, AchievementUpdate,
   BlogPostInsert, BlogPostUpdate, GalleryItemInsert, GalleryItemUpdate,
+  GalleryCategoryInsert, GalleryCategoryUpdate,
   ResumeSectionInsert, ResumeSectionUpdate, ResumeFileInsert
 } from '@/lib/types/database'
+import type { GalleryItem } from '@/lib/types'
 
 // ─── Dashboard Stats ──────────────────────────────────────────
 export async function getDashboardStats() {
@@ -241,11 +243,41 @@ export async function adminUpdateBlogPost(id: string, update: BlogPostUpdate) {
   return supabase.from('blog_posts').update(update).eq('id', id)
 }
 
-// ─── Gallery ─────────────────────────────────────────────────
-export async function adminGetGallery(): Promise<GalleryItem[]> {
+// ─── Gallery Categories ──────────────────────────────────────
+export async function adminGetGalleryCategories(): Promise<GalleryCategoryDB[]> {
   const supabase = await createClient()
-  const { data } = await supabase.from('gallery').select('*').order('display_order').order('created_at', { ascending: false })
+  const { data } = await supabase.from('gallery_categories').select('*').order('sort_order', { ascending: true })
   return data ?? []
+}
+
+export async function adminCreateGalleryCategory(category: GalleryCategoryInsert) {
+  const supabase = await createClient()
+  return supabase.from('gallery_categories').insert(category).select().single()
+}
+
+export async function adminUpdateGalleryCategory(id: string, update: GalleryCategoryUpdate) {
+  const supabase = await createClient()
+  return supabase.from('gallery_categories').update(update).eq('id', id)
+}
+
+export async function adminDeleteGalleryCategory(id: string) {
+  const supabase = await createClient()
+  return supabase.from('gallery_categories').delete().eq('id', id)
+}
+
+// ─── Gallery Items ───────────────────────────────────────────
+export async function adminGetGallery(
+  options?: { categoryId?: string }
+): Promise<GalleryItem[]> {
+  const supabase = await createClient()
+  let query = supabase.from('gallery').select('*, category_data:gallery_categories(*)')
+  
+  if (options?.categoryId) {
+    query = query.eq('category_id', options.categoryId)
+  }
+  
+  const { data } = await query.order('display_order', { ascending: true }).order('created_at', { ascending: false })
+  return (data as any) ?? []
 }
 
 export async function adminCreateGalleryItem(item: GalleryItemInsert) {

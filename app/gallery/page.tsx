@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Reveal } from "@/components/ui/Reveal";
-import { getPublicGallery } from "@/lib/supabase/queries";
+import { getPublicGallery, getPublishedGalleryCategories } from "@/lib/supabase/queries";
 import { GalleryList } from "./_components/GalleryList";
 
 export const metadata: Metadata = {
@@ -11,7 +11,8 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function GalleryPage() {
-  const galleryItems = await getPublicGallery();
+  const { data: galleryItems, count } = await getPublicGallery({ page: 1, limit: 20 });
+  const categories = await getPublishedGalleryCategories();
 
   return (
     <div className="section-padding">
@@ -26,7 +27,7 @@ export default async function GalleryPage() {
           </p>
         </Reveal>
 
-        <GalleryList initialItems={galleryItems} />
+        <GalleryList initialItems={galleryItems} initialCount={count} categories={categories} />
       </div>
     </div>
   );

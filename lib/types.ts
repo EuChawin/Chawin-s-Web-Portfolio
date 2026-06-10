@@ -141,21 +141,34 @@ export interface BlogPost {
 }
 
 // ─── Gallery ───────────────────────────────────────────────────────
-export type GalleryCategory =
-  | "travel"
-  | "finland"
-  | "university"
-  | "projects"
-  | "events"
-  | "presentations";
+export interface GalleryCategory {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  cover_image_url: string | null;
+  sort_order: number;
+  is_published: boolean;
+}
 
 export interface GalleryItem {
   id: string;
-  image_url: string;
-  caption: string;
-  category: GalleryCategory;
-  order: number;
-  published: boolean;
+  title: string | null;
+  description: string | null;
+  file_url: string;
+  thumbnail_url: string | null;
+  file_type: "image" | "video";
+  alt_text: string | null;
+  tags: string[];
+  category: string | null; // Legacy
+  category_id: string | null;
+  category_data?: GalleryCategory | null; // Joined
+  taken_at: string | null;
+  location: string | null;
+  is_featured: boolean;
+  is_public: boolean;
+  is_published: boolean;
+  display_order: number;
 }
 
 // ─── Resume ────────────────────────────────────────────────────────
