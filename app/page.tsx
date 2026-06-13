@@ -10,9 +10,9 @@ import { RecommendationsPreviewSection } from "@/components/sections/Recommendat
 import { getProfile, getCurrentlyItems, getPublishedTimeline, getFeaturedProjects } from "@/lib/supabase/queries";
 
 export const metadata: Metadata = {
-  title: "Chawin Phaikeaw — Computer Engineering Student & Builder",
+  title: "Chawin Phaikeaw Portfolio",
   description:
-    "Computer Engineering student passionate about AI, Robotics, and Entrepreneurship. International experience across Thailand and Finland (Aalto University via ODOS).",
+    "Portfolio of Chawin Phaikeaw, a Computer Engineering student who enjoys exploring the intersection of technology, innovation, and entrepreneurship.",
 };
 
 export const revalidate = 3600; // ISR revalidate every hour

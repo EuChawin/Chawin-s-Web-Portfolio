@@ -5,6 +5,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import type { Metadata } from "next";
 import { getProjectBySlug, getPublishedProjects } from "@/lib/supabase/queries";
 import { formatDateShort } from "@/lib/utils/slug";
+import type { ProjectSection } from "@/lib/types/database";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -37,6 +38,11 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     );
   }
 
+  const sections: ProjectSection[] = (project.metadata as any)?.sections || [];
+  const visibleSections = sections
+    .filter(s => s.visible && s.content?.trim().length > 0)
+    .sort((a, b) => a.order - b.order);
+
   return (
     <div className="section-padding">
       <div className="container-main">
@@ -66,16 +72,29 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 </span>
               </div>
               <h1 className="font-serif text-h1 mb-4" style={{ color: "var(--text-primary)" }}>{project.title}</h1>
-              <p className="text-body-lg mb-8" style={{ color: "var(--text-secondary)", lineHeight: "1.75" }}>{project.description}</p>
+              <p className="text-body-lg mb-12" style={{ color: "var(--text-secondary)", lineHeight: "1.75" }}>{project.description}</p>
             </Reveal>
 
-            <Reveal delay={0.1}>
-              <div className="prose-portfolio">
-                {project.description ? project.description.split("\n\n").map((para, i) => (
-                  <p key={i} className="mb-4 text-body" style={{ color: "var(--text-secondary)", lineHeight: "1.75" }}>{para}</p>
-                )) : null}
-              </div>
-            </Reveal>
+            {visibleSections.map((section, idx) => (
+              <Reveal key={idx} delay={0.1 + idx * 0.05}>
+                <div className="mb-12">
+                  <h2 className="font-serif text-h2 mb-6" style={{ color: "var(--text-primary)" }}>{section.title}</h2>
+                  <div className="prose-portfolio">
+                    {section.content.split('\n\n').map((para, i) => {
+                      if (para.trim().startsWith('- ')) {
+                        const items = para.split('\n').filter(l => l.trim().startsWith('- ')).map(l => l.trim().substring(2));
+                        return (
+                          <ul key={i} className="list-disc pl-5 mb-6 text-body" style={{ color: "var(--text-secondary)" }}>
+                            {items.map((item, j) => <li key={j} className="mb-2">{item}</li>)}
+                          </ul>
+                        );
+                      }
+                      return <p key={i} className="mb-6 text-body" style={{ color: "var(--text-secondary)", lineHeight: "1.75" }}>{para}</p>;
+                    })}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
           </div>
 
           {/* Sidebar */}

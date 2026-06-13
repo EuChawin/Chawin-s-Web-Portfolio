@@ -9,6 +9,13 @@
 // They will be replaced by the generated version after connection.
 // ============================================================
 
+export interface ProjectSection {
+  title: string
+  content: string
+  order: number
+  visible: boolean
+}
+
 export type Json =
   | string
   | number

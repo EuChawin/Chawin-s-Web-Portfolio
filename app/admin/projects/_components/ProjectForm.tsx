@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, Loader2, Globe, EyeOff } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, Globe, EyeOff, Eye, ChevronUp, ChevronDown, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { ImageUpload } from '@/components/ui/ImageUpload'
 import { createProject, updateProject } from '@/lib/actions/projects'
-import type { Project } from '@/lib/types/database'
+import type { Project, ProjectSection } from '@/lib/types/database'
 
 interface ProjectFormProps {
   initialData?: Project
@@ -27,6 +27,22 @@ export function ProjectForm({ initialData, isEdit = false }: ProjectFormProps) {
   // Image state
   const [coverFile, setCoverFile] = useState<File | null>(null)
 
+  // Sections state
+  const defaultSections: ProjectSection[] = [
+    { title: "Overview", content: "", order: 0, visible: true },
+    { title: "Problem", content: "", order: 1, visible: true },
+    { title: "Solution", content: "", order: 2, visible: true },
+    { title: "Technologies Used", content: "", order: 3, visible: true },
+    { title: "Key Features", content: "", order: 4, visible: true },
+    { title: "My Role", content: "", order: 5, visible: true },
+    { title: "Results", content: "", order: 6, visible: true },
+    { title: "Challenges", content: "", order: 7, visible: true },
+    { title: "What I Learned", content: "", order: 8, visible: true }
+  ]
+  const [sections, setSections] = useState<ProjectSection[]>(
+    (initialData?.metadata as any)?.sections || defaultSections
+  )
+
   const handleArrayAdd = (e: React.KeyboardEvent, input: string, setter: any, list: string[], setInput: any) => {
     if (e.key === 'Enter' && input.trim()) {
       e.preventDefault()
@@ -41,6 +57,29 @@ export function ProjectForm({ initialData, isEdit = false }: ProjectFormProps) {
     setter(list.filter((_, i) => i !== index))
   }
 
+  const updateSection = (index: number, field: keyof ProjectSection, value: any) => {
+    const newSections = [...sections]
+    newSections[index] = { ...newSections[index], [field]: value }
+    setSections(newSections)
+  }
+
+  const moveSection = (index: number, direction: 1 | -1) => {
+    if (index + direction < 0 || index + direction >= sections.length) return
+    const newSections = [...sections]
+    const temp = newSections[index]
+    newSections[index] = newSections[index + direction]
+    newSections[index + direction] = temp
+    // Update orders
+    newSections.forEach((sec, i) => sec.order = i)
+    setSections(newSections)
+  }
+
+  const removeSection = (index: number) => {
+    const newSections = sections.filter((_, i) => i !== index)
+    newSections.forEach((sec, i) => sec.order = i)
+    setSections(newSections)
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSaving(true)
@@ -50,6 +89,7 @@ export function ProjectForm({ initialData, isEdit = false }: ProjectFormProps) {
       const formData = new FormData(e.currentTarget)
       formData.set('tech_stack', JSON.stringify(techStack))
       formData.set('tags', JSON.stringify(tags))
+      formData.set('metadata_sections', JSON.stringify(sections))
       
       // Explicitly handle booleans from checkboxes
       formData.set('is_featured', formData.get('is_featured') === 'on' ? 'true' : 'false')
@@ -153,6 +193,58 @@ export function ProjectForm({ initialData, isEdit = false }: ProjectFormProps) {
                 className="w-full px-4 py-2.5 rounded-md border text-body-sm outline-none transition-all focus:border-[var(--accent)] bg-[var(--bg)] border-[var(--border)] text-[var(--text-primary)] resize-y"
                 placeholder="Full project details..."
               />
+            </div>
+          </div>
+
+          {/* Case Study Sections */}
+          <div className="card p-6 space-y-5">
+            <div className="flex items-center justify-between border-b border-[var(--border)] pb-3 mb-4">
+              <div>
+                <h3 className="font-medium text-[var(--text-primary)]">Case Study Sections</h3>
+                <p className="text-xs text-[var(--text-tertiary)] mt-1">Leave content empty or toggle the eye icon to hide a section.</p>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setSections([...sections, { title: "New Section", content: "", order: sections.length, visible: true }])} 
+                className="text-sm font-medium text-[var(--accent)] hover:opacity-80"
+              >
+                + Add Section
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              {sections.map((section, i) => (
+                 <div key={i} className="border border-[var(--border)] rounded-md p-4 bg-[var(--bg-surface-2)] transition-all">
+                    <div className="flex items-center gap-3 mb-3">
+                       <button type="button" onClick={() => moveSection(i, -1)} disabled={i === 0} className="p-1 rounded hover:bg-[var(--border)] disabled:opacity-30">
+                         <ChevronUp size={16} />
+                       </button>
+                       <button type="button" onClick={() => moveSection(i, 1)} disabled={i === sections.length - 1} className="p-1 rounded hover:bg-[var(--border)] disabled:opacity-30">
+                         <ChevronDown size={16} />
+                       </button>
+                       <input 
+                         value={section.title} 
+                         onChange={(e) => updateSection(i, 'title', e.target.value)}
+                         className="flex-1 bg-transparent border-b border-transparent hover:border-[var(--border)] focus:border-[var(--accent)] outline-none font-medium text-[var(--text-primary)] px-1 py-0.5"
+                       />
+                       <button type="button" onClick={() => updateSection(i, 'visible', !section.visible)} className="p-1.5 rounded hover:bg-[var(--border)] text-[var(--text-secondary)]">
+                         {section.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+                       </button>
+                       <button type="button" onClick={() => removeSection(i)} className="p-1.5 rounded hover:bg-red-500/20 text-red-500">
+                         <Trash2 size={16} />
+                       </button>
+                    </div>
+                    {section.visible && (
+                      <textarea
+                        value={section.content}
+                        onChange={(e) => updateSection(i, 'content', e.target.value)}
+                        rows={4}
+                        className="w-full px-4 py-2.5 rounded-md border text-body-sm outline-none transition-all focus:border-[var(--accent)] bg-[var(--bg)] border-[var(--border)] text-[var(--text-primary)] resize-y mt-2"
+                        placeholder="Section content... Use '- ' for bullet points."
+                      />
+                    )}
+                 </div>
+              ))}
             </div>
           </div>
 

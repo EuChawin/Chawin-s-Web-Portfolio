@@ -40,6 +40,11 @@ export async function createProject(formData: FormData) {
     if ('url' in result) cover_image_url = result.url
   }
 
+  const tech_stack = JSON.parse(formData.get('tech_stack') as string || '[]')
+  const tags = JSON.parse(formData.get('tags') as string || '[]')
+  const metadataSectionsStr = formData.get('metadata_sections') as string
+  const sections = metadataSectionsStr ? JSON.parse(metadataSectionsStr) : []
+
   const { data, error } = await supabase.from('projects').insert({
     slug,
     title,
@@ -47,13 +52,14 @@ export async function createProject(formData: FormData) {
     description:  formData.get('description') as string || undefined,
     demo_url:     formData.get('demo_url') as string || undefined,
     repo_url:     formData.get('repo_url') as string || undefined,
-    tech_stack:   JSON.parse(formData.get('tech_stack') as string || '[]'),
-    tags:         JSON.parse(formData.get('tags') as string || '[]'),
+    tech_stack,
+    tags,
     status:       (formData.get('status') as string) || 'completed',
     start_date:   formData.get('start_date') as string || undefined,
     end_date:     formData.get('end_date') as string || undefined,
     is_featured:  formData.get('is_featured') === 'true',
     is_published: formData.get('is_published') === 'true',
+    metadata:     { sections },
     cover_image_url,
   }).select().single()
 
@@ -78,6 +84,13 @@ export async function updateProject(id: string, formData: FormData) {
     if ('url' in result) cover_image_url = result.url
   }
 
+  const tech_stack = JSON.parse(formData.get('tech_stack') as string || '[]')
+  const tags = JSON.parse(formData.get('tags') as string || '[]')
+  const metadataSectionsStr = formData.get('metadata_sections') as string
+  const sections = metadataSectionsStr ? JSON.parse(metadataSectionsStr) : []
+
+  const { data: currentProject } = await supabase.from('projects').select('metadata').eq('id', id).single()
+
   const update: Record<string, unknown> = {
     slug,
     title:        formData.get('title') as string,
@@ -85,13 +98,17 @@ export async function updateProject(id: string, formData: FormData) {
     description:  formData.get('description') as string || null,
     demo_url:     formData.get('demo_url') as string || null,
     repo_url:     formData.get('repo_url') as string || null,
-    tech_stack:   JSON.parse(formData.get('tech_stack') as string || '[]'),
-    tags:         JSON.parse(formData.get('tags') as string || '[]'),
+    tech_stack,
+    tags,
     status:       formData.get('status') as string,
     start_date:   formData.get('start_date') as string || null,
     end_date:     formData.get('end_date') as string || null,
     is_featured:  formData.get('is_featured') === 'true',
     is_published: formData.get('is_published') === 'true',
+    metadata: {
+      ...(currentProject?.metadata as Record<string, unknown> ?? {}),
+      sections
+    }
   }
   if (cover_image_url) update.cover_image_url = cover_image_url
 
